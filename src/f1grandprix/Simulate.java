@@ -5,6 +5,9 @@
  */
 package f1grandprix;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 /**
  *
  * @author milan
@@ -21,5 +24,21 @@ public class Simulate {
         System.out.println(drv.getName());
         System.out.println(drv.getRanking());
         System.out.println(drv.getSpecialSkill());
+        
+        RNG generator = new RNG(10, 20);
+        System.out.println(generator.getRandomValue());
+        
+        Venue ven;
+        ven = new Venue("Albert Park Raceway Australia,3,79,0.05");
+        System.out.println(ven.getVenueName());
+        System.out.println(ven.getNumberOfLaps());
+        System.out.println(ven.getAverageLapTime());
+        System.out.println(ven.getChanceOfRain());
+        
+        Championship chmp;
+        chmp = new Championship("vozaci.txt", "staze.txt");
+        ArrayList<Driver> drivers = chmp.getDrivers();
+        //pokusaj da sortiras vozace
+        Collections.sort(drivers);
     }
 }

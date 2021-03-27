@@ -9,7 +9,7 @@ package f1grandprix;
  *
  * @author milan
  */
-public class Driver {
+public class Driver implements Comparable<Driver>{
     //atributi
     private String name;
     private int ranking;
@@ -17,6 +17,10 @@ public class Driver {
     private boolean eligibleToRace;
     private int accumulatedTime;
     private int accumulatedPoints;
+    //ovaj atribut sam ja dodao, da bi
+    //svaki vozac imao svoju RNG klasu
+    //sa atributima u zavisnosti od njegove vestine
+    private RNG skillRNG;
     
     /**
      * Konstruktor klase Driver
@@ -38,6 +42,15 @@ public class Driver {
                 System.out.println("Unable to read driver data!");
                 System.exit(0);
             }
+            
+            //konstruisi RNG objekat sa atributima u zavisnosti od vestine vozaca
+            if(specialSkill.equalsIgnoreCase("overtaking")) {
+                //preticanje moze skratiti vreme za 10-20s
+                skillRNG = new RNG(10, 20);
+            } else {
+                //ostale vestine mogu skratiti vreme za 1-8s
+                skillRNG = new RNG(1, 8);
+            }
         } else {
             System.out.println("Driver info is not in the valid format!");
             System.exit(0);
@@ -52,10 +65,26 @@ public class Driver {
     /**
      * Funkcija koja pomocu generatora pseudoslucajnih brojeva
      * odredjuje da li ce vozac iskoristiti svoju specijalnu vestinu
-     * u datom krugu
+     * u datom krugu.
+     * <br>
+     * Moja verzija metode nema parametre, vec koristi RNG atribut
+     * Driver klase.
      */
     public void useSpecialSkill() {
-        
+        int savedTime = skillRNG.getRandomValue();
+        accumulatedTime -= savedTime;
+    }
+    
+    @Override
+    public int compareTo(Driver o) {
+        if(o == null)
+            return -1; //in case the driver is not initialized
+        if(this.ranking < o.getRanking())
+            return -1;
+        else if(this.ranking > o.getRanking())
+            return 1;
+        else
+            return 0;
     }
     
     //**********GETTER FUNKCIJE***********
