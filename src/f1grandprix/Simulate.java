@@ -13,32 +13,22 @@ import java.util.Collections;
  * @author milan
  */
 public class Simulate {
-
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
-        Driver drv;
-        drv = new Driver("Juan Manuel Fangio,3,Overtaking");
-        System.out.println(drv.getName());
-        System.out.println(drv.getRanking());
-        System.out.println(drv.getSpecialSkill());
+        //kreiraj objekat klase Championship
+        Championship grandPrix = new Championship("vozaci.txt", "staze.txt");
         
-        RNG generator = new RNG(10, 20);
-        System.out.println(generator.getRandomValue());
+        //trazi od korisnika unos broja trka u sampionatu
+        //pri cemu broj mora biti u opsegu 3-5
+        System.out.print("Please enter the number of races in the championship ");
+        System.out.println("(between 3 and 5 races)");
+        int numOfRaces = ScannerUtility.scanInt();
         
-        Venue ven;
-        ven = new Venue("Albert Park Raceway Australia,3,79,0.05");
-        System.out.println(ven.getVenueName());
-        System.out.println(ven.getNumberOfLaps());
-        System.out.println(ven.getAverageLapTime());
-        System.out.println(ven.getChanceOfRain());
-        
-        Championship chmp;
-        chmp = new Championship("vozaci.txt", "staze.txt");
-        ArrayList<Driver> drivers = chmp.getDrivers();
-        //pokusaj da sortiras vozace
-        Collections.sort(drivers);
+        while(numOfRaces < 3 || numOfRaces > 5) {
+            System.out.println("Invalid input, please enter a valid number of races (3 to 5 races allowed)");
+            numOfRaces = ScannerUtility.scanInt();
+        }
     }
 }

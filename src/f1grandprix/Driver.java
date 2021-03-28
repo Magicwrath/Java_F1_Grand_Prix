@@ -9,7 +9,7 @@ package f1grandprix;
  *
  * @author milan
  */
-public class Driver implements Comparable<Driver>{
+public class Driver {
     //atributi
     private String name;
     private int ranking;
@@ -73,18 +73,6 @@ public class Driver implements Comparable<Driver>{
     public void useSpecialSkill() {
         int savedTime = skillRNG.getRandomValue();
         accumulatedTime -= savedTime;
-    }
-    
-    @Override
-    public int compareTo(Driver o) {
-        if(o == null)
-            return -1; //in case the driver is not initialized
-        if(this.ranking < o.getRanking())
-            return -1;
-        else if(this.ranking > o.getRanking())
-            return 1;
-        else
-            return 0;
     }
     
     //**********GETTER FUNKCIJE***********

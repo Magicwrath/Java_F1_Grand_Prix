@@ -12,6 +12,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  *
@@ -92,8 +94,27 @@ public class Championship {
     }
     
     /**
-     * Metoda koja inicijalizuje atribute vozaca (npr. resetuje mogucnost
-     * vozaca da se trka, eligibleToRace)
+     * Metoda koja dodeljuje rank-ove vozacima na osnovu
+     * njihovih akumuliranih poena
+     */
+    void awardRanks() {
+        //sortiraj vozace na osnovu akumuliranih poena
+        Collections.sort(drivers, new DriverComparator("accumulatedPoints"));
+        //prva 4 vozaca dobijaju rank-ove 1-4
+        //ostali vozaci dobijaju rank 5
+        int rank = 1;
+        for(Driver drv : drivers) {
+            drv.setRanking(rank);
+            if(rank < 5)
+                ++rank;
+        }
+    }
+    
+    /**
+     * Metoda koja 
+     * inicijalizuje atribute vozaca (npr. resetuje mogucnost
+     * vozaca da se trka, eligibleToRace) i dodeljuje vr. kasnjenja
+     * na osnovu pozicije vozaca u sampionatu.
      */
     void prepareForTheRace() {
         //na pocetku svake trke, svakom vozacu daj mogucnost da se trka
@@ -193,7 +214,81 @@ public class Championship {
             drv.setAccumulatedTime(accTime);
         }
     }
-
+    
+    /**
+     * Metoda koja se koristi nakon
+     * svakog kruga da ispise vozaca sa najmanjim akumuliranim
+     * vremenom
+     * 
+     * @param lap Parametar koji se koristi da bi se u ispisu
+     * naznacilo o kom krugu je rec
+     * 
+     * PITATI PROFESORA DA LI JE POTREBAN PARAMETAR int lap
+     */
+    void printLeader(int lap) {
+        Driver tmpDriver;
+        Driver leader = drivers.get(0);
+        int shortestTime = leader.getAccumulatedTime();
+        
+        for(int i = 1; i < drivers.size(); ++i) {
+            tmpDriver = drivers.get(i);
+            if(tmpDriver.getAccumulatedTime() < shortestTime) {
+                leader = tmpDriver;
+                shortestTime = tmpDriver.getAccumulatedTime();
+            }
+        }
+        
+        //ispisi informacije o vozacu sa najmanjim
+        //akumuliranim vremenom
+        System.out.println("Leader after lap" + lap + ":");
+        System.out.println(leader.getName());
+        System.out.println("Time: " + leader.getAccumulatedTime());
+    }
+    
+    /**
+     * Metoda koja ispisuje prva cetiri mesta nakon zavrsene trke.
+     * <br>
+     * Takodje, azuriraju se akumulirani poeni datih vozaca.
+     * @param venueName Ime staze na kojoj se odrzavala trka
+     */
+    void printWinnersAfterRace(String venueName) {
+        //sortiraj vozace na osnovu vremena
+        Collections.sort(drivers, new DriverComparator("accumulatedTime"));
+        int awardPoints[] = {8, 5, 3, 1}; //poeni za mesta
+        
+        //prva 4 vozaca u sortiranoj kolekciji dobijaju poene
+        //ostali ne
+        System.out.println("***************");
+        System.out.println("Winners at " + venueName + ":");
+        Driver drv;
+        for(int i = 0; i < 4; ++i) {
+            drv = drivers.get(i);
+            System.out.println(i + ": " + drv.getName() + " " + drv.getAccumulatedTime());
+            
+            int accPoints = drv.getAccumulatedPoints();
+            accPoints += awardPoints[i];
+            drv.setAccumulatedPoints(accPoints);
+        }
+        System.out.println("***************");
+    }
+    
+    /**
+     * Metoda koja ispisuje ime vozaca koji je osvojio najvise poena
+     * tokom sampionata sa numOfRaces trka
+     * @param numOfRaces Parametar koji sluzi da se naznaci u ispisu koliko je
+     * bilo trka
+     */
+    void printChampion(int numOfRaces) {
+        //s obzirom da awardRanks() metoda sortira
+        //na osnovu akumuliranih poena, dovoljno je samo
+        //iscitati ime vozaca na prvom mestu u kolekciji
+        //drivers
+        Driver champion = drivers.get(0);
+        System.out.println("**********CHAMPIONSHIP WINNER AFTER " + numOfRaces + "**********");
+        System.out.println(champion.getName());
+        System.out.println("************************************");
+    }
+    
     //**********GETTER I SETTER FUNKCIJE**********
     public ArrayList<Driver> getDrivers() {
         return drivers;
