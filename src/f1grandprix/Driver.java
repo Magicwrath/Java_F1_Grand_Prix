@@ -10,6 +10,9 @@ package f1grandprix;
  * @author milan
  */
 public class Driver {
+    //konstanta koja oznacava sansu da se promene pneumatici
+    //tokom kruga
+    final int LAP_TIRE_CHANGE = 50;
     //atributi
     private String name;
     private int ranking;
@@ -21,6 +24,9 @@ public class Driver {
     //svaki vozac imao svoju RNG klasu
     //sa atributima u zavisnosti od njegove vestine
     private RNG skillRNG;
+    //moji dodati atributi
+    //promenljiva koja oznacava da li vozac ima pneumatike za kisu
+    private boolean usingRainTires;
     
     /**
      * Konstruktor klase Driver
@@ -60,6 +66,8 @@ public class Driver {
         eligibleToRace = true;
         accumulatedPoints = 0;
         accumulatedTime = 0;
+        //vozac pocinje trku sa pneumaticima za suvo vreme
+        usingRainTires = false;
     }
     
     /**
@@ -67,12 +75,24 @@ public class Driver {
      * odredjuje da li ce vozac iskoristiti svoju specijalnu vestinu
      * u datom krugu.
      * <br>
-     * Moja verzija metode nema parametre, vec koristi RNG atribut
-     * Driver klase.
+     * @param currentLap Trenutni krug u voznji staze, na osnovu ovog
+     * parametra se odredjuje da li ce se vestina iskoristiti
      */
-    public void useSpecialSkill() {
-        int savedTime = skillRNG.getRandomValue();
-        accumulatedTime -= savedTime;
+    public void useSpecialSkill(int currentLap) {
+        int savedTime;
+        if(specialSkill.equalsIgnoreCase("overtaking")) {
+            //ova vestina moze svaki 3. krug
+            if(currentLap % 3 == 0) {
+                savedTime = skillRNG.getRandomValue();
+                accumulatedTime -= savedTime;
+                System.out.println("Driver " + name + " used overtaking for " + savedTime +"s!");
+            } 
+        } else {
+            //ostale vestine mogu svaki krug
+            savedTime = skillRNG.getRandomValue();
+            accumulatedTime -= savedTime;
+            System.out.println("Driver " + name + " used braking/cornering for " + savedTime +"s!");
+        }
     }
     
     //**********GETTER FUNKCIJE***********
@@ -99,6 +119,10 @@ public class Driver {
     public int getAccumulatedPoints() {
         return accumulatedPoints;
     }
+    
+    public boolean isUsingRainTires() {
+        return usingRainTires;
+    }
     //************************************
     
     //**********SETTER FUNKCIJE***********
@@ -124,6 +148,10 @@ public class Driver {
 
     public void setAccumulatedPoints(int accumulatedPoints) {
         this.accumulatedPoints = accumulatedPoints;
+    }
+    
+    public void setUsingRainTires(boolean usingRainTires) {
+        this.usingRainTires = usingRainTires;
     }
     //************************************
 }

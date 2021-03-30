@@ -122,6 +122,7 @@ public class Championship {
         //osnovu ranking-a vozaca
         for(Driver drv : drivers) {
             drv.setEligibleToRace(true);
+            drv.setUsingRainTires(false);
             drv.setAccumulatedTime(0);
             int rank = drv.getRanking();
 
@@ -171,10 +172,11 @@ public class Championship {
      * Poziva se metoda useSpecialSkill() klase Driver koja na osnovu
      * vestine vozaca generise slucajan broj koji oduzima od akumuliranog
      * vremena.
+     * @param currentLap Trenutni krug koji se vozi na datoj stazi
      */
-    void applySpecialSkills() {
+    void applySpecialSkills(int currentLap) {
         for(Driver drv : drivers) {
-            drv.useSpecialSkill();
+            drv.useSpecialSkill(currentLap);
         }
     }
     
@@ -182,7 +184,7 @@ public class Championship {
      * Metoda koja za svakog vozaca proverava da li se desio
      * kvar. U slucaju da se kvar desio, dodaje se adekvatno vreme
      */
-    void checkMechanicalProblem() {
+    void checkMechanicalProblems() {
         //prvo se proverava verovatnoca za najmanje verovatan slucaj
         //odnosno, za neotklonjiv mehanicki kvar
         RNG faultRNG;
@@ -263,13 +265,24 @@ public class Championship {
         Driver drv;
         for(int i = 0; i < 4; ++i) {
             drv = drivers.get(i);
-            System.out.println(i + ": " + drv.getName() + " " + drv.getAccumulatedTime());
+            System.out.println((i + 1) + ": " + drv.getName() + " " + drv.getAccumulatedTime());
             
             int accPoints = drv.getAccumulatedPoints();
             accPoints += awardPoints[i];
             drv.setAccumulatedPoints(accPoints);
         }
+
         System.out.println("***************");
+        
+        //na kraju se vozaci sortiraju po poenima i dodeljuju im se rankovi
+        Collections.sort(drivers, new DriverComparator("accumulatedPoints"));
+        for(int i = 0; i < drivers.size(); ++i) {
+            //prva 4 vozaca dobijaju rankove 1-4, ostali dobijaju rank 5
+            if(i < 4)
+                drivers.get(i).setRanking(i + 1);
+            else
+                drivers.get(i).setRanking(5);
+        }
     }
     
     /**
@@ -284,9 +297,57 @@ public class Championship {
         //iscitati ime vozaca na prvom mestu u kolekciji
         //drivers
         Driver champion = drivers.get(0);
-        System.out.println("**********CHAMPIONSHIP WINNER AFTER " + numOfRaces + "**********");
-        System.out.println(champion.getName());
-        System.out.println("************************************");
+        System.out.println("\n**********CHAMPIONSHIP WINNER AFTER " + numOfRaces + "**********");
+        System.out.println(champion.getName() + " - " +champion.getAccumulatedPoints() + "pts");
+        System.out.println("***********************************************");
+    }
+    
+    /**
+     * Metoda koja proverava da li vozac koristi pneumatike
+     * za suvo vreme.
+     * <br>
+     * Ukoliko ih ne koristi, u datom krugu ce ih promeniti
+     * sa pneumaticima za kisu sa 50% verovatnoce (uz 10s vr. kasnjenje)
+     */
+    void changeTires() {
+        for(Driver drv : drivers) {
+            if(!drv.isUsingRainTires()) {
+                RNG randomChanceGenerator = new RNG(1, 100);
+                int randomChance = randomChanceGenerator.getRandomValue();
+
+                if(randomChance <= 50) {
+                    //promeni pneumatike i dodaj 10s kasnjenje
+                    drv.setUsingRainTires(true);
+                    int accTime = drv.getAccumulatedTime();
+                    accTime += 10;
+                    drv.setAccumulatedTime(accTime);
+                    System.out.println("Driver " + drv.getName() + " switched to rain tires");
+                }
+            }
+        }
+    }
+    
+    /**
+     * Metoda koja simulira kisu, i kaznjava sve vozace bez pneumatika za kisu
+     * sa 5s
+     * @param rainChance Sansa da ce kisa pasti (realan broj)
+     */
+    void checkRain(double rainChance) {
+        RNG randomChanceGenerator = new RNG(1, 100);
+        int randomChance = randomChanceGenerator.getRandomValue();
+        int rainChancePercent = (int) (rainChance * 100); //u procentima
+        //System.out.println("RAIN CHANCE = " + rainChancePercent);
+        
+        if(randomChance <= rainChancePercent) {
+            //pala je kisa, proveri koji vozaci nemaju pneumatike za kisu
+            System.out.println("RAINY WEATHER!");
+            for(Driver drv : drivers) {
+                if(!drv.isUsingRainTires()) {
+                    int accTime = drv.getAccumulatedTime() + 5;
+                    drv.setAccumulatedTime(accTime);
+                }
+            }
+        }
     }
     
     //**********GETTER I SETTER FUNKCIJE**********
