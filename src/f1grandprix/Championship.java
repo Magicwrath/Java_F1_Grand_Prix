@@ -199,21 +199,30 @@ public class Championship {
             int accTime = drv.getAccumulatedTime();
             int faultProbability = faultRNG.getRandomValue();
             
-            if(faultProbability <= UNRECOVERABLE_MECHANICAL_FAULT) {
-                //neotklonjiv kvar, vozac ne moze vise da se trka
-                drv.setEligibleToRace(false);
-                System.out.println("Driver " + drv.getName() + " suffered an unrecoverable fault!");
-            } else if(faultProbability <= MAJOR_MECHANICAL_FAUlT) {
-                //veliki kvar, dodatnih 120s na akumulirano vreme
-                accTime += 120;
-                System.out.println("Driver " + drv.getName() + " suffered a major fault!");
-            } else if(faultProbability <= MINOR_MECHANICAL_FAULT) {
-                //mali kvar, dodatnih 20s na akumulirano vreme
-                accTime += 20;
-                System.out.println("Driver " + drv.getName() + " suffered a minor fault");
+            if(drv.isEligibleToRace()) {
+                if(faultProbability <= UNRECOVERABLE_MECHANICAL_FAULT) {
+                    //neotklonjiv kvar, vozac ne moze vise da se trka
+                    drv.setEligibleToRace(false);
+                    System.out.println("Driver " + drv.getName() + " suffered an unrecoverable fault!");
+                } else {
+                    faultProbability = faultRNG.getRandomValue();
+                    
+                    if(faultProbability <= MAJOR_MECHANICAL_FAUlT) {
+                        //veliki kvar, dodatnih 120s na akumulirano vreme
+                        accTime += 120;
+                        System.out.println("Driver " + drv.getName() + " suffered a major fault!");
+                    } else {
+                        faultProbability = faultRNG.getRandomValue();
+                        
+                        if(faultProbability <= MINOR_MECHANICAL_FAULT) {
+                            //mali kvar, dodatnih 20s na akumulirano vreme
+                            accTime += 20;
+                            System.out.println("Driver " + drv.getName() + " suffered a minor fault");
+                        }
+                    }
+                }
+                drv.setAccumulatedTime(accTime);
             }
-            
-            drv.setAccumulatedTime(accTime);
         }
     }
     
@@ -242,9 +251,9 @@ public class Championship {
         
         //ispisi informacije o vozacu sa najmanjim
         //akumuliranim vremenom
-        System.out.println("Leader after lap" + lap + ":");
+        System.out.print("\nLeader after lap " + lap + ": ");
         System.out.println(leader.getName());
-        System.out.println("Time: " + leader.getAccumulatedTime());
+        System.out.println("Time: " + leader.getAccumulatedTime() + "s");
     }
     
     /**
@@ -265,7 +274,7 @@ public class Championship {
         Driver drv;
         for(int i = 0; i < 4; ++i) {
             drv = drivers.get(i);
-            System.out.println((i + 1) + ": " + drv.getName() + " " + drv.getAccumulatedTime());
+            System.out.println((i + 1) + ": " + drv.getName() + " " + drv.getAccumulatedTime() + "s");
             
             int accPoints = drv.getAccumulatedPoints();
             accPoints += awardPoints[i];
@@ -274,6 +283,7 @@ public class Championship {
 
         System.out.println("***************");
         
+        /*
         //na kraju se vozaci sortiraju po poenima i dodeljuju im se rankovi
         Collections.sort(drivers, new DriverComparator("accumulatedPoints"));
         for(int i = 0; i < drivers.size(); ++i) {
@@ -283,6 +293,7 @@ public class Championship {
             else
                 drivers.get(i).setRanking(5);
         }
+        */
     }
     
     /**
@@ -297,9 +308,9 @@ public class Championship {
         //iscitati ime vozaca na prvom mestu u kolekciji
         //drivers
         Driver champion = drivers.get(0);
-        System.out.println("\n**********CHAMPIONSHIP WINNER AFTER " + numOfRaces + "**********");
+        System.out.println("\n**********CHAMPIONSHIP WINNER AFTER " + numOfRaces + " RACES**********");
         System.out.println(champion.getName() + " - " +champion.getAccumulatedPoints() + "pts");
-        System.out.println("***********************************************");
+        System.out.println("*****************************************************");
     }
     
     /**
@@ -308,20 +319,24 @@ public class Championship {
      * <br>
      * Ukoliko ih ne koristi, u datom krugu ce ih promeniti
      * sa pneumaticima za kisu sa 50% verovatnoce (uz 10s vr. kasnjenje)
+     * @param currentLap Trenutni krug date trke, pneumatici se smeju menjati
+     * samo u drugom krugu!
      */
-    void changeTires() {
-        for(Driver drv : drivers) {
-            if(!drv.isUsingRainTires()) {
-                RNG randomChanceGenerator = new RNG(1, 100);
-                int randomChance = randomChanceGenerator.getRandomValue();
+    void changeTires(int currentLap) {
+        if(currentLap == 2) {
+            for(Driver drv : drivers) {
+                if(!drv.isUsingRainTires()) {
+                    RNG randomChanceGenerator = new RNG(1, 100);
+                    int randomChance = randomChanceGenerator.getRandomValue();
 
-                if(randomChance <= 50) {
-                    //promeni pneumatike i dodaj 10s kasnjenje
-                    drv.setUsingRainTires(true);
-                    int accTime = drv.getAccumulatedTime();
-                    accTime += 10;
-                    drv.setAccumulatedTime(accTime);
-                    System.out.println("Driver " + drv.getName() + " switched to rain tires");
+                    if(randomChance <= 50) {
+                        //promeni pneumatike i dodaj 10s kasnjenje
+                        drv.setUsingRainTires(true);
+                        int accTime = drv.getAccumulatedTime();
+                        accTime += 10;
+                        drv.setAccumulatedTime(accTime);
+                        System.out.println("Driver " + drv.getName() + " switched to rain tires");
+                    }
                 }
             }
         }

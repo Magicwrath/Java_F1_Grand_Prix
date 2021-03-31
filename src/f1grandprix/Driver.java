@@ -85,13 +85,13 @@ public class Driver {
             if(currentLap % 3 == 0) {
                 savedTime = skillRNG.getRandomValue();
                 accumulatedTime -= savedTime;
-                System.out.println("Driver " + name + " used overtaking for " + savedTime +"s!");
+                //System.out.println("Driver " + name + " used overtaking for " + savedTime +"s!");
             } 
         } else {
             //ostale vestine mogu svaki krug
             savedTime = skillRNG.getRandomValue();
             accumulatedTime -= savedTime;
-            System.out.println("Driver " + name + " used braking/cornering for " + savedTime +"s!");
+            //System.out.println("Driver " + name + " used braking/cornering for " + savedTime +"s!");
         }
     }
     

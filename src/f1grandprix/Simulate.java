@@ -62,18 +62,22 @@ public class Simulate {
                 //primeni vestine vozaca
                 grandPrix.applySpecialSkills(currentLap);
                 //proveriti da li ce neki vozaci promeniti pneumatike
-                grandPrix.changeTires();
+                grandPrix.changeTires(currentLap);
                 //proveri da li je pala kisa i kazni vozace bez pneumatika
                 //za kisu
                 grandPrix.checkRain(chosenVenue.getChanceOfRain());
                 //na kraju, proveri mehanicke kvarove
                 grandPrix.checkMechanicalProblems();
+                grandPrix.printLeader(currentLap);
                 System.out.println("\n");
                 ++currentLap;
             }
             
             //na kraju ispisi tabelu sa vozacima
             grandPrix.printWinnersAfterRace(chosenVenue.getVenueName());
+            
+            //dodeli vozacima rankove na osnovu akumuliranih poena
+            grandPrix.awardRanks();
             
             ++currentRace;
             if(currentRace > numOfRaces) {
