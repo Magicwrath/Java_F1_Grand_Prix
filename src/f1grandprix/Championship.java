@@ -243,7 +243,7 @@ public class Championship {
         
         for(int i = 1; i < drivers.size(); ++i) {
             tmpDriver = drivers.get(i);
-            if(tmpDriver.getAccumulatedTime() < shortestTime) {
+            if(tmpDriver.getAccumulatedTime() < shortestTime && tmpDriver.isEligibleToRace()) {
                 leader = tmpDriver;
                 shortestTime = tmpDriver.getAccumulatedTime();
             }
